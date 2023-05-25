@@ -12,6 +12,9 @@ using System.Security.Cryptography;
 
 namespace HashComparer
 {
+
+    //https://www.c-sharpcorner.com/UploadFile/Bhaskarg/multithreading-in-C-Sharp/
+
     public partial class Form1 : Form
     {
         public static List<String> srcFiles;
@@ -84,6 +87,29 @@ namespace HashComparer
 
         private void calculateHashesButton_Click(object sender, EventArgs e)
         {
+
+            List<string> srcHashes = calculateSrcHashFiles(sender, e);
+            List<string> destHashes = calculateDestHashFiles(sender, e);
+
+            List<string> duplicates = srcHashes.Intersect(destHashes).ToList();
+
+            int index = 0;
+
+            foreach (string hash in duplicates)
+            {
+                // listView1.Items[i].BackColor = Color.Red;   
+                var item = listView1.FindItemWithText(hash);
+                index = listView1.Items.IndexOf(item);
+
+                listView1.Items[index].BackColor = Color.LightGreen;
+
+            }
+
+        }
+
+        private List<String> calculateSrcHashFiles(object sender, EventArgs e)
+        {
+            List<String> hashes = new List<string>();
             ListViewItem item;
             string[] arr = new string[2];
 
@@ -91,11 +117,32 @@ namespace HashComparer
             {
                 arr[0] = file;
                 arr[1] = calculate_MD5(file);
+                hashes.Add(arr[1]);
                 item = new ListViewItem(arr);
                 listView1.Items.Add(item);
                 listView1.Update();
             }
 
+            return hashes;
+        }
+
+        private List<String> calculateDestHashFiles(object sender, EventArgs e)
+        {
+            List<String> hashes = new List<string>();
+            ListViewItem item;
+            string[] arr = new string[2];
+
+            foreach (string file in destFiles)
+            {
+                arr[0] = file;
+                arr[1] = calculate_MD5(file);
+                hashes.Add(arr[1]);
+                item = new ListViewItem(arr);
+                listView1.Items.Add(item);
+                listView1.Update();
+            }
+
+            return hashes;
         }
 
         private static List<String> ListDirectory(TreeView treeView, string path)
@@ -154,6 +201,8 @@ namespace HashComparer
         {
             return null;
         }
+
+
 
         //private void UpdateProgress()
         //{
